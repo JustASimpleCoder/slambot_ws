@@ -20,7 +20,7 @@ class MotorControllerPublisher : public rclcpp::Node
     {
         publisher_ = this->create_publisher<std_msgs::msg::String>("motor_control", 10);
         timer_ = this->create_wall_timer(
-        1000ms, std::bind(&MotorControllerPublisher::timer_callback, this));
+            100ms, std::bind(&MotorControllerPublisher::wait_for_user_command_and_publish, this));
     }
 
   private:
@@ -29,13 +29,20 @@ class MotorControllerPublisher : public rclcpp::Node
         std::string user_input = wait_for_user();
         auto message = std_msgs::msg::String();
         message.data = wait_for_user();
-        if(user_input ==0 || user_input == 1 || user_input == 1 ){
+
+        if(user_input == "0" || user_input == "1" || user_input == "2" ){
             RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
             this->publisher_->publish(message);
         }else{
-             auto error_message = std_msgs::msg::String();
-             error_message.data = "invalid command, try again";
-            RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", error_message.data .c_str());
+            if (user_input == "kill") {
+                RCLCPP_INFO(this->get_logger(), "Shutting down the node...");
+                rclcpp::shutdown();
+                return; 
+            }
+            
+            auto error_message = std_msgs::msg::String();
+            error_message.data = "invalid command, try again";
+            RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", error_message.data.c_str());
         }
     }
     rclcpp::TimerBase::SharedPtr timer_;
@@ -46,7 +53,7 @@ class MotorControllerPublisher : public rclcpp::Node
         while (true) {
             std::cout << "\nPress 0 to stop the robot, 1 to move forward 5 seconds, or 2 to move backward 5 seconds: ";
             std::getline(std::cin, input);
-            if (input == "0" || input == "1" || input == "2") {
+            if (input == "0" || input == "1" || input == "2" || input == "kill") {
                 return input; // Return the valid input
             } else {
                 std::cout << "Invalid input. Please enter 0, 1, or 2.";
