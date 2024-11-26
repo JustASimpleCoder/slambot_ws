@@ -3,14 +3,45 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <unordered_map>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 
 using namespace std::chrono_literals;
 
-/* This example creates a subclass of Node and uses std::bind() to register a
-* member function as a callback from the timer. */
+enum class RobotCommand {
+    STOP = 0,
+    MOVE_FORWARD = 1,
+    MOVE_BACKWARD = 2,
+    TURN_LEFT = 3,
+    TURN_RIGHT = 4,
+    INVALID = -1
+};
+
+static const std::unordered_map<std::string, RobotCommand> command_map = {
+    {"0", RobotCommand::STOP},
+    {"1", RobotCommand::MOVE_FORWARD},
+    {"2", RobotCommand::MOVE_BACKWARD},
+    {"3", RobotCommand::TURN_LEFT},
+    {"4", RobotCommand::TURN_RIGHT}
+};
+
+const std::unordered_map<RobotCommand, std::string> command_descriptions = {
+    {RobotCommand::STOP, "Stop the robot"},
+    {RobotCommand::MOVE_FORWARD, "Move forward for 5 seconds"},
+    {RobotCommand::MOVE_BACKWARD, "Move backward for 5 seconds"},
+    {RobotCommand::TURN_LEFT, "Turn left for 5 seconds"},
+    {RobotCommand::TURN_RIGHT, "Turn right for 5 seconds"}
+};
+// Convert user input to a RobotCommand
+RobotCommand parse_command(const std::string &input) {
+    auto it = command_map.find(input);
+    return (it != command_map.end()) ? it->second : RobotCommand::INVALID;
+}
+
+
+
 
 class MotorControllerPublisher : public rclcpp::Node
 {
@@ -28,10 +59,13 @@ class MotorControllerPublisher : public rclcpp::Node
     {
         std::string user_input = wait_for_user();
         auto message = std_msgs::msg::String();
-        message.data = wait_for_user();
+        message.data = user_input;
 
-        if(user_input == "0" || user_input == "1" || user_input == "2" ){
-            RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+        RobotCommand command = parse_command(user_input);
+
+        if(command != RobotCommand::INVALID ){
+            std::string log_message = "Publishing: '" + command_descriptions.at(command);
+            RCLCPP_INFO(this->get_logger(), "%s" , log_message.c_str());
             this->publisher_->publish(message);
         }else{
             if (user_input == "kill") {
@@ -51,12 +85,14 @@ class MotorControllerPublisher : public rclcpp::Node
     std::string wait_for_user(){
         std::string input;
         while (true) {
-            std::cout << "\nPress 0 to stop the robot, 1 to move forward 5 seconds, or 2 to move backward 5 seconds: ";
+            std::cout << "\nPress 0 to stop the robot, 1 to move forwartd, 2 to move backward, 3 for right turn or 4 for lewft turn ";
             std::getline(std::cin, input);
-            if (input == "0" || input == "1" || input == "2" || input == "kill") {
+
+            auto it = command_map.find(input);
+            if (it != command_map.end()) {
                 return input; // Return the valid input
             } else {
-                std::cout << "Invalid input. Please enter 0, 1, or 2.";
+                std::cout << "Invalid input! Please enter 0, 1, 2, 3 or 4";
             }
         }
     }
