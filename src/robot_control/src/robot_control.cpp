@@ -16,6 +16,8 @@ enum class RobotCommand {
     MOVE_BACKWARD = 2,
     TURN_LEFT = 3,
     TURN_RIGHT = 4,
+    TURN_LEFT_OPP = 5,
+    TURN_RIGHT_OPP = 6,
     INVALID = -1
 };
 
@@ -24,7 +26,9 @@ static const std::unordered_map<std::string, RobotCommand> command_map = {
     {"1", RobotCommand::MOVE_FORWARD},
     {"2", RobotCommand::MOVE_BACKWARD},
     {"3", RobotCommand::TURN_LEFT},
-    {"4", RobotCommand::TURN_RIGHT}
+    {"4", RobotCommand::TURN_RIGHT},
+    {"5", RobotCommand::TURN_LEFT_OPP},
+    {"6", RobotCommand::TURN_RIGHT_OPP}
 };
 
 const std::unordered_map<RobotCommand, std::string> command_descriptions = {
@@ -32,15 +36,15 @@ const std::unordered_map<RobotCommand, std::string> command_descriptions = {
     {RobotCommand::MOVE_FORWARD, "Move forward for 5 seconds"},
     {RobotCommand::MOVE_BACKWARD, "Move backward for 5 seconds"},
     {RobotCommand::TURN_LEFT, "Turn left for 5 seconds"},
-    {RobotCommand::TURN_RIGHT, "Turn right for 5 seconds"}
+    {RobotCommand::TURN_RIGHT, "Turn right for 5 seconds"},
+    {RobotCommand::TURN_LEFT_OPP, "Turn left for 5 seconds, right side backwards"},
+    {RobotCommand::TURN_RIGHT_OPP, "Turn right for 5 seconds, right side backwards"}
 };
 // Convert user input to a RobotCommand
 RobotCommand parse_command(const std::string &input) {
     auto it = command_map.find(input);
     return (it != command_map.end()) ? it->second : RobotCommand::INVALID;
 }
-
-
 
 
 class MotorControllerPublisher : public rclcpp::Node
