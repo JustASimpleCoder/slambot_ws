@@ -1,3 +1,5 @@
+
+
 const int right_front_pin = 6;
 const int right_front_dir1_pin = 4;
 const int right_front_dir2_pin = 7;
@@ -16,7 +18,7 @@ const int left_back_dir2_pin = 12;
 
 // for the DC motor, sometimes a full high 
 int start_speed = 255;
-int motor_speed = 200;
+int motor_speed = 255;
 int count = 0;
 
 void setup() {
@@ -60,9 +62,7 @@ void forward_n_milisec(int n_milisec){
      analogWrite(right_back_pin, start_speed);
      analogWrite(left_front_pin, start_speed);
      analogWrite(left_back_pin, start_speed);
-     
-     delay(10);
-     
+    
      analogWrite(right_front_pin, motor_speed);
      analogWrite(right_back_pin, motor_speed);
      analogWrite(left_front_pin, motor_speed);
@@ -108,8 +108,7 @@ void backward_n_milisec(int n_milisec){
 }
 
 void left_side_move_n_milisec(int n_milisec){
-    Serial.println("starting to test the left side");
-      
+     Serial.println("moving Left side");
      digitalWrite(left_front_dir1_pin, HIGH);
      digitalWrite(left_front_dir2_pin, LOW);
       
@@ -132,7 +131,7 @@ void left_side_move_n_milisec(int n_milisec){
 
 
 void right_side_move_n_milisec(int n_milisec){
-    Serial.println("starting to test the right side");
+     Serial.println("moving right side");
       
      digitalWrite(right_front_dir1_pin, HIGH);
      digitalWrite(right_front_dir2_pin, LOW);
@@ -154,6 +153,41 @@ void right_side_move_n_milisec(int n_milisec){
      stop_robot();
 }
 
+void right_turn(int n_milisec){
+     digitalWrite(left_front_dir1_pin, LOW);
+     digitalWrite(left_front_dir2_pin, HIGH);
+      
+     digitalWrite(left_back_dir1_pin, HIGH);
+     digitalWrite(left_back_dir2_pin, LOW);
+
+           
+     digitalWrite(right_front_dir1_pin, HIGH);
+     digitalWrite(right_front_dir2_pin, LOW);
+      
+     digitalWrite(right_back_dir1_pin, LOW);
+     digitalWrite(right_back_dir2_pin, HIGH);
+   
+     analogWrite(right_front_pin, start_speed);
+     analogWrite(right_back_pin, start_speed);
+     analogWrite(left_front_pin, start_speed);
+     analogWrite(left_back_pin, start_speed);
+     
+     delay(10);
+     
+     analogWrite(right_front_pin, motor_speed);
+     analogWrite(right_back_pin, motor_speed);
+     analogWrite(left_front_pin, motor_speed);
+     analogWrite(left_back_pin, motor_speed);
+     
+     delay(n_milisec);
+     
+     stop_robot();
+}
+
+void left_turn(n_milisec){
+     
+}
+
 void stop_robot(){
      analogWrite(right_front_pin, 0);
      analogWrite(right_back_pin, 0);
@@ -161,9 +195,7 @@ void stop_robot(){
      analogWrite(left_back_pin, 0);
 }
 
-
 void loop() {
-
   if (Serial.available() > 0) {
     int command = Serial.parseInt();
     Serial.println(command);
@@ -183,6 +215,27 @@ void loop() {
       case 4:
         right_side_move_n_milisec(500);
         break;
+      case 5: 
+        right_turn(500);
+        break;
+      case 6: 
+        left_turn(500);
+        break;
     }
-  }
+
+    byte = Serial.read(command);
+    switch(command){
+      case 'w':
+        forward_n_milisec(500);
+        break;
+      case 's':
+        left_turn(500);
+        break;
+      case 'a':
+        backward_n_milisec(500);
+        break;
+      case 'd':
+        left_side_move_n_milisec(500);
+        break;
+    }
 }

@@ -41,8 +41,6 @@ RobotCommand parse_command(const std::string &input) {
 }
 
 
-
-
 class MotorControllerPublisher : public rclcpp::Node
 {
   public:
