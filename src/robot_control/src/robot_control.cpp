@@ -16,8 +16,8 @@ enum class RobotCommand {
     MOVE_BACKWARD = 2,
     TURN_LEFT = 3,
     TURN_RIGHT = 4,
-    TURN_LEFT_OPP = 5,
-    TURN_RIGHT_OPP = 6,
+    TURN_LEFT_OPP = 5, //
+    TURN_RIGHT_OPP = 6, //
     INVALID = -1
 };
 
@@ -59,20 +59,24 @@ class MotorControllerPublisher : public rclcpp::Node
     }
 
   private:
+    std::string user_input; 
+
+
     void wait_for_user_command_and_publish()
     {
-        std::string user_input = wait_for_user();
+        
+        std::string valid_user_input = wait_for_user();
         auto message = std_msgs::msg::String();
-        message.data = user_input;
+        message.data = valid_user_input;
 
-        RobotCommand command = parse_command(user_input);
+        RobotCommand command = parse_command(valid_user_input);
 
         if(command != RobotCommand::INVALID ){
             std::string log_message = "Publishing: '" + command_descriptions.at(command);
             RCLCPP_INFO(this->get_logger(), "%s" , log_message.c_str());
             this->publisher_->publish(message);
         }else{
-            if (user_input == "kill") {
+            if (valid_user_input == "kill") {
                 RCLCPP_INFO(this->get_logger(), "Shutting down the node...");
                 rclcpp::shutdown();
                 return; 
@@ -87,17 +91,37 @@ class MotorControllerPublisher : public rclcpp::Node
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
 
     std::string wait_for_user(){
-        std::string input;
         while (true) {
-            std::cout << "\nPress 0 to stop the robot, 1 to move forwartd, 2 to move backward, 3 for right turn or 4 for lewft turn ";
-            std::getline(std::cin, input);
+            std::cout << "\nPress 0 to stop the robot, 1 to move forwartd, 2 to move backward, 3/5 for right turn or 46 for left turn ";
+            std::cin >> user_input;
 
-            auto it = command_map.find(input);
+            check_wasd_input();
+
+            auto it = command_map.find(user_input);
             if (it != command_map.end()) {
-                return input; // Return the valid input
+                return user_input; // Return the valid input
             } else {
-                std::cout << "Invalid input! Please enter 0, 1, 2, 3 or 4";
+                std::cout << "Invalid input! Please enter 0, 1, 2, 3 or 4\n";
+                std::cout << "..Or press w (UP), s (Down), a (Left), d (right)\n";
             }
+        }
+    }
+
+    void check_wasd_input(){
+        if (user_input == "w") {
+            user_input = "1";
+        }
+        if (user_input == "s") {  
+            user_input = "2";
+        }
+        if (user_input =="a") {  
+            user_input = "5";
+        }
+        if (user_input == "d") {  
+            user_input = "6";
+        }
+        if (user_input == "x") {  
+            user_input = "0";
         }
     }
 };
