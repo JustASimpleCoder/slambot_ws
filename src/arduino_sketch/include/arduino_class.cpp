@@ -46,6 +46,7 @@ void MotorCommands::moveForward() {
 }
 
 void MotorCommands::moveBackward() {
+    wheel_speed = 255;
     right.setDirection(backwards);
     right.setSpeed(wheel_speed);
 
