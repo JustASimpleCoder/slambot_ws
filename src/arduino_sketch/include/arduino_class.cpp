@@ -1,6 +1,6 @@
 #include "arduino_class.hpp"
 
-// uncomment during delopment as having troulbe importing arduino.h class. 
+// uncomment during delopment as having troulbe importing arduino.h class on WSL. 
 
 //ensure to comment out below before uploading sketch Un
 // void analogWrite(int a, int b){};
@@ -36,6 +36,12 @@ void Motor::setDirection(bool forward) {
 }
 
 
+void MotorCommands::handleSpeedControl() {
+    // currently we have to set wheel speed in each function 
+    // would be nice to start with slower movement and go up to full speed
+    // 
+
+}
 void MotorCommands::moveForward() {
     wheel_speed = 255;
     right.setDirection(forwards);
@@ -54,6 +60,8 @@ void MotorCommands::moveBackward() {
     left.setSpeed(wheel_speed);
 }
 void MotorCommands::stopMotors() {
+
+    Serial.println("stopping motor");
     wheel_speed = 0;
     right.setSpeed(0);
     left.setSpeed(0);
@@ -80,39 +88,38 @@ void MotorCommands::turnRight() {
 void MotorCommands::motor_control_loop() {
 
     if (Serial.available() > 0) {
-        int command = Serial.parseInt();
+        char input = Serial.read();
+        int command = -1;
+        if (input == 'x') command = STOP;
+        if (input == 'w') command = MOVE_FORWARD;
+        if (input == 's') command = MOVE_BACKWARD;
+        if (input == 'a') command = TURN_LEFT_OPP;
+        if (input == 'd') command = TURN_RIGHT_OPP;
+
+
         switch (command) {
             case MOVE_FORWARD:
-                this->moveForward();
-                lastCommand = &MotorCommands::moveForward;  // Store function pointer
+                this->moveForward();  // Store function pointer
                 break;
             case MOVE_BACKWARD:
                 this->moveBackward();
-                lastCommand = &MotorCommands::moveBackward;
                 break;
-            case TURN_LEFT:
-                this->moveBackward();
-                lastCommand = &MotorCommands::turnLeft;
+            case TURN_LEFT_OPP:
+                this->turnLeft();
                 break;
-            case TURN_RIGHT:
-                this->moveBackward();
-                lastCommand = &MotorCommands::turnRight;
+            case TURN_RIGHT_OPP:
+                this->turnRight();
                 break;
             case STOP:
-                this->moveBackward();
-                lastCommand = &MotorCommands::stopMotors;
+                this->stopMotors();
                 break;
             default:
                 //maintain last command();
-                (this->*lastCommand)();
                 break;
         }
     }
-    // If a valid lastCommand exists, call it, even without serialization
-    if (lastCommand) {
-        (this->*lastCommand)();
-    }
-};
+}
+
 
 void MotorCommands::arduino_setup(){
     pinMode(right.pwm_front_pin, OUTPUT);

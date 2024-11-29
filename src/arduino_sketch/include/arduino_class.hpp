@@ -15,6 +15,8 @@ const int TURN_LEFT_OPP = 5; // both side of robot move in opposite dir
 const int TURN_RIGHT_OPP = 6; //both side of robot move in opposite dir  
 const int INVALID = -1;
 
+
+
 class Motor {
     public:
         int pwm_front_pin;
@@ -50,10 +52,10 @@ class MotorCommands {
             : right(6, 4, 7, 5, 2, 3),
             left(9, 11, 8, 10, 13, 12),
             wheel_speed(0),
-            lastCommand(nullptr) {}
+            lastCommand(MotorCommands::lastCommand) {}
         
         ~MotorCommands(){
-            stopMotors();
+            //stopMotors();
         }
 
         void arduino_setup();
@@ -69,5 +71,7 @@ class MotorCommands {
         void turnRight();
 
         void motor_control_loop();
+
+        void handleSpeedControl();
 };
 #endif

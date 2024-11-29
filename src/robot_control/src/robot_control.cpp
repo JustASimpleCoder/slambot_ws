@@ -14,38 +14,33 @@ enum class RobotCommand {
     STOP = 0,
     MOVE_FORWARD = 1,
     MOVE_BACKWARD = 2,
-    TURN_LEFT = 3,
+    TURN_LEFT = 3, //may use in future builds
     TURN_RIGHT = 4,
-    TURN_LEFT_OPP = 5, //
-    TURN_RIGHT_OPP = 6, //
+    TURN_LEFT_OPP = 5, 
+    TURN_RIGHT_OPP = 6, 
     INVALID = -1
 };
 
 static const std::unordered_map<std::string, RobotCommand> command_map = {
-    {"0", RobotCommand::STOP},
-    {"1", RobotCommand::MOVE_FORWARD},
-    {"2", RobotCommand::MOVE_BACKWARD},
-    {"3", RobotCommand::TURN_LEFT},
-    {"4", RobotCommand::TURN_RIGHT},
-    {"5", RobotCommand::TURN_LEFT_OPP},
-    {"6", RobotCommand::TURN_RIGHT_OPP}
+    {"x", RobotCommand::STOP},
+    {"w", RobotCommand::MOVE_FORWARD},
+    {"s", RobotCommand::MOVE_BACKWARD},
+    {"a", RobotCommand::TURN_LEFT_OPP},
+    {"d", RobotCommand::TURN_RIGHT_OPP}
 };
 
-const std::unordered_map<RobotCommand, std::string> command_descriptions = {
-    {RobotCommand::STOP, "Stop the robot"},
-    {RobotCommand::MOVE_FORWARD, "Move forward for 5 seconds"},
-    {RobotCommand::MOVE_BACKWARD, "Move backward for 5 seconds"},
-    {RobotCommand::TURN_LEFT, "Turn left for 5 seconds"},
-    {RobotCommand::TURN_RIGHT, "Turn right for 5 seconds"},
-    {RobotCommand::TURN_LEFT_OPP, "Turn left for 5 seconds, right side backwards"},
-    {RobotCommand::TURN_RIGHT_OPP, "Turn right for 5 seconds, right side backwards"}
+const std::unordered_map<std::string, std::string> command_descriptions = {
+    {"x", "Stop the robot"},
+    {"w", "Move forward"},
+    {"s", "Move backward"},
+    {"a", "Turn left"},
+    {"d", "Turn right"}
 };
 // Convert user input to a RobotCommand
 RobotCommand parse_command(const std::string &input) {
     auto it = command_map.find(input);
     return (it != command_map.end()) ? it->second : RobotCommand::INVALID;
 }
-
 
 class MotorControllerPublisher : public rclcpp::Node
 {
@@ -60,68 +55,43 @@ class MotorControllerPublisher : public rclcpp::Node
 
   private:
     std::string user_input; 
+    rclcpp::TimerBase::SharedPtr timer_;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
 
 
     void wait_for_user_command_and_publish()
     {
-        
         std::string valid_user_input = wait_for_user();
         auto message = std_msgs::msg::String();
-        message.data = valid_user_input;
 
-        RobotCommand command = parse_command(valid_user_input);
-
-        if(command != RobotCommand::INVALID ){
-            std::string log_message = "Publishing: '" + command_descriptions.at(command);
-            RCLCPP_INFO(this->get_logger(), "%s" , log_message.c_str());
-            this->publisher_->publish(message);
-        }else{
-            if (valid_user_input == "kill") {
-                RCLCPP_INFO(this->get_logger(), "Shutting down the node...");
-                rclcpp::shutdown();
-                return; 
-            }
+        if(valid_user_input == "kill"){
+            RCLCPP_INFO(this->get_logger(), "Shutting down the node...");
+            rclcpp::shutdown();
+            return; 
             
             auto error_message = std_msgs::msg::String();
-            error_message.data = "invalid command, try again";
+            error_message.data = "Shutting down the node...";
             RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", error_message.data.c_str());
+
         }
+        
+        message.data = valid_user_input;
+        std::string log_message = "Publishing: '" + command_descriptions.at(valid_user_input);
+        RCLCPP_INFO(this->get_logger(), "%s" , log_message.c_str());
+        this->publisher_->publish(message);
     }
-    rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
 
     std::string wait_for_user(){
         while (true) {
-            std::cout << "\nPress 0 to stop the robot, 1 to move forwartd, 2 to move backward, 3/5 for right turn or 46 for left turn ";
+            std::cout << "\nPress w (UP), s (Down), a (Left), d (right) or x (stop). Enter 'kill' to shutdown node \n";
             std::cin >> user_input;
-
-            check_wasd_input();
+            std::cout << "You entered " << user_input << "\n";
 
             auto it = command_map.find(user_input);
-            if (it != command_map.end()) {
+            if (it != command_map.end() || user_input == "kill") {
                 return user_input; // Return the valid input
-            } else {
-                std::cout << "Invalid input! Please enter 0, 1, 2, 3 or 4\n";
-                std::cout << "..Or press w (UP), s (Down), a (Left), d (right)\n";
             }
-        }
-    }
-
-    void check_wasd_input(){
-        if (user_input == "w") {
-            user_input = "1";
-        }
-        if (user_input == "s") {  
-            user_input = "2";
-        }
-        if (user_input =="a") {  
-            user_input = "5";
-        }
-        if (user_input == "d") {  
-            user_input = "6";
-        }
-        if (user_input == "x") {  
-            user_input = "0";
+            std::cout << "Press w (UP), s (Down), a (Left), d (right) or x (stop)\n";
         }
     }
 };
