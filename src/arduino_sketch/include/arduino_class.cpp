@@ -34,16 +34,30 @@ void Motor::setDirection(bool forward) {
     digitalWrite(dir1_back_pin, forward ? LOW : HIGH);
     digitalWrite(dir2_back_pin, forward ? HIGH : LOW);
 }
-
-
-void MotorCommands::handleSpeedControl() {
-    // currently we have to set wheel speed in each function 
-    // would be nice to start with slower movement and go up to full speed
-    // 
-
+void MotorCommands::increaseSpeed() {
+   changeSpeed(true);
 }
+void MotorCommands::decreaseSpeed() {
+   changeSpeed(false);
+}
+void MotorCommands::changeSpeed(bool increase) {
+    wheel_speed = (increase) ? wheel_speed += 25 : wheel_speed -= 25;
+    wheel_speed = (wheel_speed > static_cast<int>(SpeedLimit::MAX)) ? static_cast<int>(SpeedLimit::MAX) : wheel_speed;
+    wheel_speed = (wheel_speed < static_cast<int>(SpeedLimit::MIN)) ? static_cast<int>(SpeedLimit::MIN) : wheel_speed;
+    
+    right.setSpeed(wheel_speed);
+    left.setSpeed(wheel_speed);
+}
+void MotorCommands::setStartingSpeed() {
+    if (wheel_speed == 0){
+        wheel_speed = static_cast<int>(SpeedLimit::MIN);
+    }
+}
+
 void MotorCommands::moveForward() {
-    wheel_speed = 255;
+
+    setStartingSpeed();
+
     right.setDirection(forwards);
     right.setSpeed(wheel_speed);
 
@@ -52,7 +66,7 @@ void MotorCommands::moveForward() {
 }
 
 void MotorCommands::moveBackward() {
-    wheel_speed = 255;
+    setStartingSpeed();
     right.setDirection(backwards);
     right.setSpeed(wheel_speed);
 
@@ -68,7 +82,7 @@ void MotorCommands::stopMotors() {
 }
 
 void MotorCommands::turnLeft() {
-    wheel_speed = 255;
+    setStartingSpeed();
     right.setDirection(forwards);
     right.setSpeed(wheel_speed);
 
@@ -77,7 +91,7 @@ void MotorCommands::turnLeft() {
 }
 
 void MotorCommands::turnRight() {
-    wheel_speed = 255;
+    setStartingSpeed();
     right.setDirection(backwards);
     right.setSpeed(wheel_speed);
 
@@ -89,29 +103,36 @@ void MotorCommands::motor_control_loop() {
 
     if (Serial.available() > 0) {
         char input = Serial.read();
-        int command = -1;
-        if (input == 'x') command = STOP;
-        if (input == 'w') command = MOVE_FORWARD;
-        if (input == 's') command = MOVE_BACKWARD;
-        if (input == 'a') command = TURN_LEFT_OPP;
-        if (input == 'd') command = TURN_RIGHT_OPP;
-
+        RobotCommand command = RobotCommand::INVALID;
+        if (input == 'x') command = RobotCommand::STOP;
+        if (input == 'w') command = RobotCommand::MOVE_FORWARD;
+        if (input == 's') command = RobotCommand::MOVE_BACKWARD;
+        if (input == 'a') command = RobotCommand::TURN_LEFT_OPP;
+        if (input == 'd') command = RobotCommand::TURN_RIGHT_OPP;
+        if (input == '-') command = RobotCommand::SLOWER;
+        if (input == '+') command = RobotCommand::FASTER;
 
         switch (command) {
-            case MOVE_FORWARD:
+            case RobotCommand::MOVE_FORWARD:
                 this->moveForward();  // Store function pointer
                 break;
-            case MOVE_BACKWARD:
+            case RobotCommand::MOVE_BACKWARD:
                 this->moveBackward();
                 break;
-            case TURN_LEFT_OPP:
+            case RobotCommand::TURN_LEFT_OPP:
                 this->turnLeft();
                 break;
-            case TURN_RIGHT_OPP:
+            case RobotCommand::TURN_RIGHT_OPP:
                 this->turnRight();
                 break;
-            case STOP:
+            case RobotCommand::STOP:
                 this->stopMotors();
+                break;
+            case RobotCommand::FASTER:
+                this->increaseSpeed();
+                break;
+            case RobotCommand::SLOWER:
+                this->decreaseSpeed();
                 break;
             default:
                 //maintain last command();

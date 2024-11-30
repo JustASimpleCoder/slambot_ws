@@ -6,16 +6,31 @@
 #define ANALOG_WRITE_WHEEL_MAX 255
 #define ANALOG_WRITE_WHEEL_MIN 125
 
-const int STOP = 0;
-const int MOVE_FORWARD = 1;
-const int MOVE_BACKWARD = 2;
-const int TURN_LEFT = 3;
-const int TURN_RIGHT = 4;
-const int TURN_LEFT_OPP = 5; // both side of robot move in opposite dir  
-const int TURN_RIGHT_OPP = 6; //both side of robot move in opposite dir  
-const int INVALID = -1;
+// const int STOP = 0;
+// const int MOVE_FORWARD = 1;
+// const int MOVE_BACKWARD = 2;
+// const int TURN_LEFT = 3;
+// const int TURN_RIGHT = 4;
+// const int TURN_LEFT_OPP = 5; // both side of robot move in opposite dir  
+// const int TURN_RIGHT_OPP = 6; //both side of robot move in opposite dir  
+// const int INVALID = -1;
+enum class SpeedLimit {
+    MIN = 125,
+    MAX = 255
+};
 
-
+enum class RobotCommand {
+    STOP = 0,
+    MOVE_FORWARD = 1,
+    MOVE_BACKWARD = 2,
+    TURN_LEFT = 3,
+    TURN_RIGHT = 4,
+    TURN_LEFT_OPP = 5,
+    TURN_RIGHT_OPP = 6,
+    FASTER = 7,
+    SLOWER = 8,
+    INVALID = -1
+};
 
 class Motor {
     public:
@@ -39,7 +54,6 @@ class MotorCommands {
     private:
         Motor right;
         Motor left;
-
 
         void (MotorCommands::*lastCommand)();
         
@@ -72,6 +86,12 @@ class MotorCommands {
 
         void motor_control_loop();
 
-        void handleSpeedControl();
+        void changeSpeed(bool increase);
+
+        void increaseSpeed();
+
+        void decreaseSpeed();
+
+        void setStartingSpeed();
 };
 #endif

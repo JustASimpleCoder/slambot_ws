@@ -91,29 +91,22 @@ void RobotGUI::run() {
 
 std::string RobotGUI::wait_for_user(GLFWwindow* window) {
     // stop takes precedent
-    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
-        return "x";
-    }
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        return "w";
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        return "s";
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        return "a";
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        return "d";
-    }
-    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
-        return "x";
-    }
-    if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
-        return "-";
-    }
-    if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) {
-        return "+";
+    static const std::unordered_map<int, std::string> key_map = {
+        {GLFW_KEY_X, "x"},
+        {GLFW_KEY_W, "w"},
+        {GLFW_KEY_S, "s"},
+        {GLFW_KEY_A, "a"},
+        {GLFW_KEY_D, "d"},
+        {GLFW_KEY_MINUS, "-"},
+        {GLFW_KEY_LEFT_SHIFT, "-"},
+        {GLFW_KEY_EQUAL, "+"},
+        {GLFW_KEY_SPACE, "+"},
+    };
+
+    for (const auto& [key, action] : key_map) {
+        if (glfwGetKey(window, key) == GLFW_PRESS) {
+            return action;
+        }
     }
     return "";  // Default if no valid key is pressed
 }
