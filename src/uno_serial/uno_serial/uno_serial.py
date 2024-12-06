@@ -13,14 +13,32 @@ class SerialNode(Node):
         self.serial_port = serial.Serial('/dev/ttyUSB0', 9600, timeout=1) # Update the port as needed
         time.sleep(2)  # Allow time for Arduino reset
 
+        self.odom_reading_ = self.create_publisher(
+            String, 
+            'odometry',
+            10,                 
+        )
+        self.timer = self.create_timer(0.1, self.talker_callback)
+        
         # Subscriber to listen for messages
-        self.subscription = self.create_subscription(
+        self.subscription_ = self.create_subscription(
             String,
             'motor_control',
             self.listener_callback,
             10
         )
         self.get_logger().info('SerialNode initialized and listening on /motor_control')
+        
+    def talker_callback(self):
+        try:
+            data = self.serial_port.readline().decode().strip()  
+            if data:
+                msg = String()
+                msg.data = data
+                self.get_logger().info(f'publishing data to the odom topic: {msg.data}')
+                self.odom_reading_.publish()
+        except Exception as e:
+            self.get_logger().error(f'Error communicating with Arduino: {e}')
 
     def listener_callback(self, msg):
         command = msg.data

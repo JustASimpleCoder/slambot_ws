@@ -6,6 +6,8 @@
 #define ANALOG_WRITE_WHEEL_MAX 255
 #define ANALOG_WRITE_WHEEL_MIN 125
 
+# define PI 3.14159265358979323846
+
 // const int STOP = 0;
 // const int MOVE_FORWARD = 1;
 // const int MOVE_BACKWARD = 2;
@@ -42,6 +44,7 @@ class Motor {
         int dir1_back_pin;
         int dir2_back_pin;
 
+
         Motor(int pwm_front, int dir1_front, int dir2_ront, int pwm_back, int dir1_back, int dir2_back)
             : pwm_front_pin(pwm_front), dir1_front_pin(dir1_front), dir2_front_pin(dir2_ront),
              pwm_back_pin(pwm_back), dir1_back_pin(dir1_back), dir2_back_pin(dir2_back) {}
@@ -59,8 +62,13 @@ class MotorCommands {
         
         bool forwards = true;
         bool backwards = false;
-    public:
 
+        //3 inches is diamter -> 0.0762 m D -> 0.0281 for radius
+        double wheel_radius = 0.0281;
+        double wheel_circum  = 2*PI*wheel_radius;
+        double wheel_base = 0.16002;
+
+    public:
         unsigned int wheel_speed;
         MotorCommands()
             : right(6, 4, 7, 5, 2, 3),
@@ -72,7 +80,11 @@ class MotorCommands {
             //stopMotors();
         }
 
-        void arduino_setup();
+        void getMotorData();
+        
+        void getOdom();
+
+        void setupArduino();
 
         void moveForward();
 
@@ -84,7 +96,7 @@ class MotorCommands {
 
         void turnRight();
 
-        void motor_control_loop();
+        void loopMotorControl();
 
         void changeSpeed(bool increase);
 
@@ -93,5 +105,7 @@ class MotorCommands {
         void decreaseSpeed();
 
         void setStartingSpeed();
+
+        void turn(bool right);
 };
 #endif

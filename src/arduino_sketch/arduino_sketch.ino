@@ -4,9 +4,9 @@
 MotorCommands commands;
 
 void setup() {
-    commands.arduino_setup();
+    commands.setupArduino();
 }
 
 void loop() {
-    commands.motor_control_loop();
+    commands.loopMotorControl();
 }
