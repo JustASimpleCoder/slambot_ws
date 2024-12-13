@@ -3,6 +3,66 @@
 #include <serial/serial.h>  // Use the serial library for C++
 #include <memory>
 #include <string>
+//Placeholder file for now
+
+// TODO: move this to ros node to handle these odom calcs and make it work with optical odemetry  
+//     double robot_x_front = 0.0; 
+//     double robot_x_back = 0.0; 
+
+//     double robot_y_front = 0.0; 
+//     double robot_y_back = 0.0; 
+
+//     double robot_theta_front = 0.0; 
+//     double robot_theta_back = 0.0; 
+
+//     // Estimate the time of travel for this cycle (in seconds)
+//     unsigned long timeInterval = 100; // Time interval in milliseconds
+//     double timeInSeconds = timeInterval / 1000.0;
+
+//     // Estimate wheel speeds based on PWM
+//     double right_front_speed = map(right.pwm_front_pin , 0, 255, 0, 1); 
+//     double right_back_speed = map(right.pwm_back_pin , 0, 255, 0, 1);
+//     double right_front_speed = map(left.pwm_front_pin , 0, 255, 0, 1); 
+//     double right_back_speed = map(left.pwm_back_pin , 0, 255, 0, 1);
+
+  
+//     // Calculate the linear distance traveled by each wheel
+//     double left_front_dist = right_front_speed * wheel_circum * timeInSeconds;
+//     double left_back_dist = right_front_speed * wheel_circum * timeInSeconds;
+//     double right_front_dist = right_front_speed * wheel_circum * timeInSeconds;
+//     double right_back_dist = right_front_speed * wheel_circum * timeInSeconds;
+
+//     // Calculate robot movement
+//     double delta_front_dist = (left_front_dist + right_front_dist) / 2.0;
+//     double delta_back_dist = (left_back_dist + right_back_dist) / 2.0;
+
+//     double delta_front_theta = (right_front_dist - left_front_dist) / wheel_base;
+//     double delta_back_theta = (right_back_dist - left_back_dist) / wheel_base;
+//     // Update robot position and orientation
+//     robot_x_front += delta_front_dist * cos(delta_front_theta);
+//     robot_x_back += delta_back_dist * cos(delta_back_theta);
+
+//     robot_y_front += delta_front_dist * sin(delta_front_theta);
+//     robot_y_back += delta_back_dist * sin(delta_back_theta);
+
+
+//     robot_theta_front += delta_front_theta; // Update orientation
+//     robot_theta_back += delta_back_theta;
+//     // Normalize angle (keep between -PI and PI)
+//     if (robot_theta_front > PI) robot_theta_front -= 2 * PI;
+//     if (robot_theta_front < -PI) robot_theta_front += 2 * PI;
+
+//     if (robot_theta_back > PI) robot_theta_back -= 2 * PI;
+//     if (robot_theta_back < -PI) robot_theta_back += 2 * PI;
+
+//   // Print the robot's current position and orientation
+//     Serial.print("FrontX: "); Serial.print(robot_x_front); 
+//     Serial.print(", FrontY: "); Serial.print(robot_y_front);
+//     Serial.print(", FrontTheta: "); Serial.println(robot_theta_front);
+
+//     Serial.print("BackX: "); Serial.print(robot_x_back); 
+//     Serial.print(", BackY: "); Serial.print(robot_y_back);
+//     Serial.print(", BackTheta: "); Serial.println(robot_theta_back);
 
 class SerialNode : public rclcpp::Node
 {

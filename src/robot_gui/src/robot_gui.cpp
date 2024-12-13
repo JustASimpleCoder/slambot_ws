@@ -73,7 +73,6 @@ void RobotGUI::run() {
 
         std_msgs::msg::String message;
         message.data = valid_user_input;
-
         try {
             std::string log_message = "Publishing: '" + command_descriptions.at(valid_user_input) + "'";
             RCLCPP_INFO(this->get_logger(), "%s", log_message.c_str());
@@ -97,6 +96,10 @@ std::string RobotGUI::wait_for_user(GLFWwindow* window) {
         {GLFW_KEY_S, "s"},
         {GLFW_KEY_A, "a"},
         {GLFW_KEY_D, "d"},
+        {GLFW_KEY_Q, "q"},
+        {GLFW_KEY_E, "e"},
+        {GLFW_KEY_C, "c"},
+        {GLFW_KEY_Z, "d"},
         {GLFW_KEY_MINUS, "-"},
         {GLFW_KEY_LEFT_SHIFT, "-"},
         {GLFW_KEY_EQUAL, "+"},

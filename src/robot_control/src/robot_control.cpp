@@ -10,6 +10,23 @@
 
 using namespace std::chrono_literals;
 
+enum class RobotMovement: char{
+    STOP = 'x',
+    MOVE_FORWARD = 'w',
+    MOVE_BACKWARD = 's',
+    MOVE_LEFT = 'l',
+    MOVE_RIGHT = 'r',
+    ROTATE_LEFT = 'a',
+    ROTATE_RIGHT = 'd',
+    DIAG_FORWARD_RIGHT = 'e',
+    DIAG_BACKWARD_RIGHT = 'c',
+    DIAG_FORWARD_LEFT = 'q',
+    DIAG_BACKWARD_LEFT = 'z',
+    FASTER = '+',
+    SLOWER = '-',
+    INVALID = '?'
+};
+
 enum class RobotCommand {
     STOP = 0,
     MOVE_FORWARD = 1,
