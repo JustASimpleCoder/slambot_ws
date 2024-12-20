@@ -8,7 +8,7 @@ This repository contains ROS2 packages for exploring SLAM (Simultaneous Localiza
 * Odometry: Four photo-interruptors to capture encoder data for accurate odometry.
 * IMU: MPU9250 providing 9 Degrees of Freedom (DOF) inertial measurement data.
 * Lidar: Luna Lidar for environmental scanning and mapping.
-* Motor Controller: 
+* Motor Controller: <br />
 &emsp;- Arduino Uno microcontroller was programmed with Arduino sketch (using PlatformIO) described here [Motor_Driver](https://github.com/JustASimpleCoder/Ardunio_Motor_Driver_Slambot.git)
 * STM32 Microcontroller firmware described here [STM32_Drivers](https://github.com/JustASimpleCoder/STM32_Sensors_Slambot), where:<br />
 &emsp;- I2C communication with the Lidar and IMU.<br />
