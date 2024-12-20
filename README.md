@@ -4,11 +4,12 @@
 This repository contains ROS2 packages for exploring SLAM (Simultaneous Localization and Mapping) with a 4-wheel differential mecanum drive robot. The robot is built using:
 
 * Chassis: Basic robot chassis with a 4-wheel mecanum drive system.
-Motors: Four TT motors for precise movement and control.
+* Motors: Four TT motors for precise movement and control.
 * Odometry: Four photo-interruptors to capture encoder data for accurate odometry.
 * IMU: MPU9250 providing 9 Degrees of Freedom (DOF) inertial measurement data.
 * Lidar: Luna Lidar for environmental scanning and mapping.
-* Motor Controller: Arduino Uno for motor control.
+* Motor Controller: 
+&emsp;- Arduino Uno microcontroller was programmed with Arduino sketch (using PlatformIO) described here [Motor_Driver](https://github.com/JustASimpleCoder/Ardunio_Motor_Driver_Slambot.git)
 * STM32 Microcontroller firmware described here [STM32_Drivers](https://github.com/JustASimpleCoder/STM32_Sensors_Slambot), where:<br />
 &emsp;- I2C communication with the Lidar and IMU.<br />
 &emsp;- IRQ (interrupt requests) for the 4 photo-interuptor encoders.<br />
@@ -23,7 +24,6 @@ This repository includes ROS2 packages that integrate these components to enable
 * Robot_gui node: Graphical interface that handles more omnidirectional control.
 
 * Uno_Serial node: handles serial communication of the Arduino Uno Rev3. Microros is too alrge to use with the Arduino Uno, and ROSSERIAl is deprecated in ROS2, so needed to create my own serialization. Check out the correpsonding arduino motor controller here (using PlatofrmIO): [Arduino_Motor_Driver_Slambot](https://github.com/JustASimpleCoder/Ardunio_Motor_Driver_Slambot)
-
 
 # Visual Representation
 
