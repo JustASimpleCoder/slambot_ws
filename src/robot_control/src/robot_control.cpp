@@ -91,7 +91,7 @@ class MotorControllerPublisher : public rclcpp::Node
             RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", error_message.data.c_str());
 
         }
-        
+
         message.data = valid_user_input;
         std::string log_message = "Publishing: '" + command_descriptions.at(valid_user_input);
         RCLCPP_INFO(this->get_logger(), "%s" , log_message.c_str());

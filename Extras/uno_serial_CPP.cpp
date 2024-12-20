@@ -3,7 +3,7 @@
 #include <serial/serial.h>  // Use the serial library for C++
 #include <memory>
 #include <string>
-//Placeholder file for now
+//Placeholder file for
 
 // TODO: move this to ros node to handle these odom calcs and make it work with optical odemetry  
 //     double robot_x_front = 0.0; 
@@ -144,8 +144,7 @@ private:
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<SerialNode>();
-    rclcpp::spin(node);
+    rclcpp::spin(std::make_shared<SerialNode>());
     rclcpp::shutdown();
     return 0;
 }
