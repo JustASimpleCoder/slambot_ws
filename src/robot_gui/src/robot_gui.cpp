@@ -60,14 +60,17 @@ class RobotGUI : public rclcpp::Node {
         rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
         std::string wait_for_user(GLFWwindow* window);
 };
-
+void glfwErrorCallback(int error, const char* description) {
+    std::cerr << "GLFW Error [" << error << "]: " << description << std::endl;
+}
 
 void RobotGUI::run() {
+
     if (!glfwInit()) {
+        glfwSetErrorCallback(glfwErrorCallback); 
         RCLCPP_ERROR(this->get_logger(), "Failed to initialize GLFW");
         return;
     }
-
 
     GLFWwindow *window = glfwCreateWindow(800, 600, "Slambot GUI", NULL, NULL);
     if (!window) {
