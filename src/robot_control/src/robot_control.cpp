@@ -38,25 +38,43 @@ enum class RobotCommand {
     INVALID = -1
 };
 
-static const std::unordered_map<std::string, RobotCommand> command_map = {
-    {"x", RobotCommand::STOP},
-    {"w", RobotCommand::MOVE_FORWARD},
-    {"s", RobotCommand::MOVE_BACKWARD},
-    {"a", RobotCommand::TURN_LEFT_OPP},
-    {"d", RobotCommand::TURN_RIGHT_OPP}
+static const std::unordered_map<std::string, RobotMovement> command_map = {
+    {"x", RobotMovement::STOP},
+    {"w", RobotMovement::MOVE_FORWARD},
+    {"s", RobotMovement::MOVE_BACKWARD},
+    {"a", RobotMovement::ROTATE_LEFT},
+    {"d", RobotMovement::ROTATE_RIGHT},
+    {"l", RobotMovement::MOVE_LEFT},
+    {"r", RobotMovement::MOVE_RIGHT},
+    {"q", RobotMovement::DIAG_FORWARD_LEFT},
+    {"e", RobotMovement::DIAG_FORWARD_RIGHT},
+    {"z", RobotMovement::DIAG_BACKWARD_LEFT},
+    {"c", RobotMovement::DIAG_BACKWARD_RIGHT},
+    {"=", RobotMovement::FASTER}, // no need to capitalize '+' 
+    {"+", RobotMovement::FASTER},
+    {"-", RobotMovement::SLOWER}
 };
 
 const std::unordered_map<std::string, std::string> command_descriptions = {
     {"x", "Stop the robot"},
-    {"w", "Move forward"},
-    {"s", "Move backward"},
-    {"a", "Turn left"},
-    {"d", "Turn right"}
+    {"w", "Move Forward"},
+    {"s", "Move Backward"},
+    {"a", "Turn Left"},
+    {"d", "Turn Right"},
+    {"l", "Move Left"},
+    {"r", "Move Right"},
+    {"q", "Diagnoal Forward Left"},
+    {"e", "Diagnoal Forward Right"},
+    {"z", "Diagnoal Backward Left"},
+    {"c", "Diagnoal Backward Right"},
+    {"=", "Faster"}, // no need to capitalize '+' 
+    {"+", "Fasster"},
+    {"-", "Slower"}
 };
 // Convert user input to a RobotCommand
-RobotCommand parse_command(const std::string &input) {
+RobotMovement parse_command(const std::string &input) {
     auto it = command_map.find(input);
-    return (it != command_map.end()) ? it->second : RobotCommand::INVALID;
+    return (it != command_map.end()) ? it->second : RobotMovement::INVALID;
 }
 
 class MotorControllerPublisher : public rclcpp::Node
