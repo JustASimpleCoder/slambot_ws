@@ -68,7 +68,7 @@ const std::unordered_map<std::string, std::string> command_descriptions = {
     {"z", "Diagnoal Backward Left"},
     {"c", "Diagnoal Backward Right"},
     {"=", "Faster"}, // no need to capitalize '+' 
-    {"+", "Fasster"},
+    {"+", "Faster"},
     {"-", "Slower"}
 };
 // Convert user input to a RobotCommand
@@ -83,9 +83,13 @@ class MotorControllerPublisher : public rclcpp::Node
     MotorControllerPublisher()
     : Node("motor_controller")
     {
-        publisher_ = this->create_publisher<std_msgs::msg::String>("motor_control", 10);
+        rclcpp::QoS qos_settings(1);  // Depth of 1 for minimal latency
+        qos_settings.reliability(rclcpp::ReliabilityPolicy::BestEffort);
+        qos_settings.durability(rclcpp::DurabilityPolicy::Volatile);
+
+        publisher_ = this->create_publisher<std_msgs::msg::String>("motor_control", qos_settings);
         timer_ = this->create_wall_timer(
-            100ms, std::bind(&MotorControllerPublisher::wait_for_user_command_and_publish, this));
+            10ms, std::bind(&MotorControllerPublisher::wait_for_user_command_and_publish, this));
     }
 
   private:
