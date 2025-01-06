@@ -12,6 +12,11 @@ class SerialNode(Node):
         # Set up the serial connection
         self.serial_port = serial.Serial('/dev/ttyUSB0', 9600, timeout=1) # Update the port as needed
         time.sleep(2)  # Allow time for Arduino reset
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,  # Ensure reliable delivery
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10
+        )
 
         self.odom_reading_ = self.create_publisher(
             String, 
@@ -25,7 +30,7 @@ class SerialNode(Node):
             String,
             'motor_control',
             self.listener_callback,
-            10
+            qos_profile
         )
         self.get_logger().info('SerialNode initialized and listening on /motor_control')
         
