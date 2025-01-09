@@ -12,11 +12,12 @@ class SerialNode(Node):
 
         # Set up the serial connection
         self.serial_port = serial.Serial('/dev/ttyUSB0', 9600, timeout=1) # Update the port as needed
-        time.sleep(2)  # Allow time for Arduino reset
-        qos_profile = QoSProfile(
-            reliability=ReliabilityPolicy.RELIABLE,  # Ensure reliable delivery
-            history=HistoryPolicy.KEEP_LAST,
-            depth=10
+        # time.sleep(2)  # Allow time for Arduino reset
+        
+        qos_settings = rclpy.qos.QoSProfile(
+            reliability=rclpy.qos.ReliabilityPolicy.BEST_EFFORT,
+            durability=rclpy.qos.DurabilityPolicy.VOLATILE,
+            depth=1
         )
 
         self.odom_reading_ = self.create_publisher(
@@ -31,7 +32,7 @@ class SerialNode(Node):
             String,
             'motor_control',
             self.listener_callback,
-            qos_profile
+            qos_settings
         )
         self.get_logger().info('SerialNode initialized and listening on /motor_control')
         
@@ -48,11 +49,11 @@ class SerialNode(Node):
 
     def listener_callback(self, msg):
         command = msg.data
-        self.get_logger().info(f'Sending Command: {command} to Arduino')
+        #self.get_logger().info(f'Sending Command: {command} to Arduino')
         try:
             self.serial_port.write(f'{command}\n'.encode())  # Send pin number to Arduino
             response = self.serial_port.read()  # Read Arduino response
-            self.get_logger().info(f'Arduino responded: {response}')
+            #self.get_logger().info(f'Arduino responded: {response}')
         except Exception as e:
             self.get_logger().error(f'Error communicating with Arduino: {e}')
 

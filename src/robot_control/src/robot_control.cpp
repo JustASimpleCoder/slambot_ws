@@ -26,18 +26,6 @@ enum class RobotMovement: char{
     SLOWER = '-',
     INVALID = '?'
 };
-
-enum class RobotCommand {
-    STOP = 0,
-    MOVE_FORWARD = 1,
-    MOVE_BACKWARD = 2,
-    TURN_LEFT = 3, //may use in future builds
-    TURN_RIGHT = 4,
-    TURN_LEFT_OPP = 5, 
-    TURN_RIGHT_OPP = 6, 
-    INVALID = -1
-};
-
 static const std::unordered_map<std::string, RobotMovement> command_map = {
     {"x", RobotMovement::STOP},
     {"w", RobotMovement::MOVE_FORWARD},
@@ -71,7 +59,7 @@ const std::unordered_map<std::string, std::string> command_descriptions = {
     {"+", "Faster"},
     {"-", "Slower"}
 };
-// Convert user input to a RobotCommand
+
 RobotMovement parse_command(const std::string &input) {
     auto it = command_map.find(input);
     return (it != command_map.end()) ? it->second : RobotMovement::INVALID;
@@ -104,27 +92,27 @@ class MotorControllerPublisher : public rclcpp::Node
         auto message = std_msgs::msg::String();
 
         if(valid_user_input == "kill"){
-            RCLCPP_INFO(this->get_logger(), "Shutting down the node...");
+            // RCLCPP_INFO(this->get_logger(), "Shutting down the node...");
             rclcpp::shutdown();
             return; 
             
             auto error_message = std_msgs::msg::String();
             error_message.data = "Shutting down the node...";
-            RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", error_message.data.c_str());
+            // RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", error_message.data.c_str());
 
         }
 
         message.data = valid_user_input;
         std::string log_message = "Publishing: '" + command_descriptions.at(valid_user_input);
-        RCLCPP_INFO(this->get_logger(), "%s" , log_message.c_str());
+        // RCLCPP_INFO(this->get_logger(), "%s" , log_message.c_str());
         this->publisher_->publish(message);
     }
 
     std::string wait_for_user(){
         while (true) {
-            std::cout << "\nPress w (UP), s (Down), a (Left), d (right) or x (stop). Enter 'kill' to shutdown node \n";
+            // std::cout << "\nPress w (UP), s (Down), a (Left), d (right) or x (stop). Enter 'kill' to shutdown node \n";
             std::cin >> user_input;
-            std::cout << "You entered " << user_input << "\n";
+            // std::cout << "You entered " << user_input << "\n";
 
             auto it = command_map.find(user_input);
             if (it != command_map.end() || user_input == "kill") {
