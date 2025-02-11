@@ -5,10 +5,17 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
+# Find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(service_msgs REQUIRED) 
+#find_package(type_description_interfaces REQUIRED)
+
+# Include directories
+include_directories(
+  include
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -22,11 +29,40 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_executable(motor_control_node src/robot_control.cpp)
-ament_target_dependencies(motor_control_node rclcpp std_msgs)
 
+# Build the library
+add_library(controller_publisher src/controller_publisher.cpp)
+target_include_directories(controller_publisher PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(controller_publisher rclcpp std_msgs )
+
+add_library(serial_communication src/serial_communication.cpp)
+target_include_directories(serial_communication PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(serial_communication rclcpp std_msgs )
+
+# Build the executable
+add_executable(motor_control_node src/robot_control.cpp)
+target_include_directories(motor_control_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(motor_control_node rclcpp std_msgs )
+target_link_libraries(motor_control_node controller_publisher)
+target_link_libraries(motor_control_node serial_communication)
+# Install targets
 install(TARGETS
+  controller_publisher
+  serial_communication
   motor_control_node
   DESTINATION lib/${PROJECT_NAME})
+
+# Install include directories
+install(DIRECTORY include/
+  DESTINATION include/${PROJECT_NAME})
 
 ament_package()
