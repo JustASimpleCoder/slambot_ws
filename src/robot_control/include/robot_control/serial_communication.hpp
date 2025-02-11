@@ -14,7 +14,7 @@ class SerialCommunication {
 
         bool open();
         void close();
-        bool isOpen() const;
+        bool is_open() const;
     
         ssize_t write(const std::string& data);
         std::string read();

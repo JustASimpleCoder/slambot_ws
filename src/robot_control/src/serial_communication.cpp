@@ -5,7 +5,7 @@ SerialCommunication::SerialCommunication(const std::string& port, int baud_rate)
     :   port_(port), baud_rate_(baud_rate), fd_(-1) {}
 
 SerialCommunication::~SerialCommunication() {
-        if (isOpen()) {
+        if (is_open()) {
             close();
         }
     }
@@ -84,19 +84,19 @@ bool SerialCommunication::open() {
 }
 
 void SerialCommunication::close() {
-    if (isOpen()) {
+    if (is_open()) {
         ::close(fd_);
         fd_ = -1;
         std::cout << "Serial port closed: " << port_ << std::endl;
     }
 }
 
-bool SerialCommunication::isOpen() const {
+bool SerialCommunication::is_open() const {
     return fd_ != -1;
 }
 
 ssize_t SerialCommunication::write(const std::string& data) {
-    if (!isOpen()) {
+    if (!is_open()) {
         std::cerr << "Serial port is not open" << std::endl;
         return -1;
     }
@@ -104,7 +104,7 @@ ssize_t SerialCommunication::write(const std::string& data) {
 }
 
 std::string SerialCommunication::read() {
-    if (!isOpen()) {
+    if (!is_open()) {
         std::cerr << "Serial port is not open" << std::endl;
         return "";
     }
