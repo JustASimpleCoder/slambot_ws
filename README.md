@@ -112,7 +112,7 @@ Planned improvements:
 
 
 # useful links
-[Kinematic Model of a Four Mecanum Wheeled Mobile Robot](https://www.matec-conferences.org/articles/matecconf/pdf/2021/12/matecconf_mse21_08003.pdf)
+[Kinematic Model of a Four Mecanum Wheeled Mobile Robot](https://research.ijcaonline.org/volume113/number3/pxc3901586.pdf)
 
 [Kinematics of differential drive](https://www.matec-conferences.org/articles/matecconf/pdf/2021/12/matecconf_mse21_08003.pdf)
 
