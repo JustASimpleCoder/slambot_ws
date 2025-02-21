@@ -31,7 +31,7 @@ if(BUILD_TESTING)
 endif()
 
 add_executable(inv_kin src/inverse_kinematics.cpp)
-ament_target_dependencies(inv_kin rclcpp std_msgs)
+ament_target_dependencies(inv_kin rclcpp std_msgs geometry_msg)
 
 install(TARGETS
   inv_kin

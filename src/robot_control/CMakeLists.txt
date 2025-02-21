@@ -31,12 +31,12 @@ endif()
 
 
 # Build the library
-add_library(controller_publisher src/controller_publisher.cpp)
-target_include_directories(controller_publisher PUBLIC
+add_library(cli_manual_control src/cli_manual_control.cpp)
+target_include_directories(cli_manual_control PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-ament_target_dependencies(controller_publisher rclcpp std_msgs )
+ament_target_dependencies(cli_manual_control rclcpp std_msgs )
 
 add_library(serial_communication src/serial_communication.cpp)
 target_include_directories(serial_communication PUBLIC
@@ -52,11 +52,11 @@ target_include_directories(motor_control_node PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 ament_target_dependencies(motor_control_node rclcpp std_msgs )
-target_link_libraries(motor_control_node controller_publisher)
+target_link_libraries(motor_control_node cli_manual_control)
 target_link_libraries(motor_control_node serial_communication)
 # Install targets
 install(TARGETS
-  controller_publisher
+  cli_manual_control
   serial_communication
   motor_control_node
   DESTINATION lib/${PROJECT_NAME})

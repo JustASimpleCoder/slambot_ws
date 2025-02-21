@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <string>
 
+#include "geometry_msgs/msg/Twist.hpp"
+
 class InverseKinematics{
     public:
         InverseKinematics();
@@ -10,6 +12,9 @@ class InverseKinematics{
         void updateDesiredSpeed(double v_x, double v_y, double omega);
         void convertToPWMSignal();
         auto computePWM(double omega);
+        
+        std::string get_arduino_uno_msg();
+
     private:
         double m_omega_LF, m_omega_RF, m_omega_LB, m_omega_RB;
         double m_r, m_a, m_b;
@@ -21,26 +26,32 @@ class InverseKinematics{
         const int min_pwm = 125;      // Minimum PWM to start motion
         const int max_pwm = 255;
 
+        std::string arduino_uno_msg = "";
 };
 
 
-InverseKinematics::InverseKinematics(){
-
+InverseKinematics::InverseKinematics(int wheel_radus, int horizontal_dist_to_wheel, int vertical_dist_to_wheel )                
+                                :   m_r(wheel_radus), m_a(horizontal_dist_to_wheel), m_b(vertical_dist_to_wheel) {
 }
+
 InverseKinematics::~InverseKinematics(){
-
 }
-
 
 void InverseKinematics::updateDesiredSpeed(double v_x, double v_y, double omega){
-
     m_omega_LF = (1 / (m_r)) * (v_x - v_y - (m_a + m_b) * omega);
     m_omega_RF = (1 / (m_r)) * (v_x + v_y + (m_a + m_b) * omega);
     m_omega_LB = (1 / (m_r)) * (v_x + v_y - (m_a + m_b) * omega);
     m_omega_RB = (1 / (m_r)) * (v_x - v_y + (m_a + m_b) * omega);
-
 }
 
+void InverseKinematics::updateDesiredSpeed(geometry_msgs::msg::Twist twist){
+    // m_omega_LF = (1 / (m_r)) * (twist.data.linear.x - twist.data.linear.y - (m_a + m_b) * twist.data.linear.z);
+    // m_omega_RF = (1 / (m_r)) * (twist.data.linear.x + twist.data.linear.y + (m_a + m_b) * twist.data.linear.z);
+    // m_omega_LB = (1 / (m_r)) * (twist.data.linear.x + twist.data.linear.y - (m_a + m_b) * twist.data.linear.z);
+    // m_omega_RB = (1 / (m_r)) * (twist.data.linear.x - twist.data.linear.y + (m_a + m_b) * twist.data.linear.z);
+    
+    updateDesiredSpeed(twist.data.linear.x, twist.data.linear.y, twist.data.angular.z);
+}
 
 enum Directions{
     BACkWARD,
@@ -61,18 +72,21 @@ void InverseKinematics::convertToPWMSignal(){
     dir_lb = (m_omega_LB >= 0) ? Directions::FORWARD : Directions::BACkWARD;
     dir_rb = (m_omega_RB >= 0) ? Directions::FORWARD : Directions::BACkWARD;
 
-    //TO_DO create an approiated schem for sending this data to arduino uno
-    // send this to arduino uno
-    // std::string arduino_msg = "";
-    // arduino_msg += msg_construction_helper(pwm_lf, dir_lf, "LF");
-    // arduino_msg += msg_construction_helper(pwm_rf, dir_rf, "RF");
-    // arduino_msg += msg_construction_helper(pwm_lb, dir_lb, "LB");
-    // arduino_msg += msg_construction_helper(pwm_rb, dir_rb, "RB");
-
-    // publish message 
+    std::string arduino_msg = "";
+    arduino_msg += msg_construction_helper(pwm_lf, dir_lf, false);
+    arduino_msg += msg_construction_helper(pwm_rf, dir_rf, false);
+    arduino_msg += msg_construction_helper(pwm_lb, dir_lb, false);
+    arduino_msg += msg_construction_helper(pwm_rb, dir_rb, true);
+    arduino_uno_msg = arduino_msg;
 }
-std::string msg_construction_helper(int pwm, int dir, std::string motor){
-    return "PWM_" + motor + "<" + std::to_string(pwm) + ">" + "DIR_" + motor + "<" + std::to_string(pwm) + ">";
+
+std::string InverseKinematics::get_arduino_uno_msg(){
+    return arduino_uno_msg;
+}
+
+//comunication protocol "pwm, dir, pwm, dir, pwm, dir, pwm, dir\r\n"
+std::string msg_construction_helper(int pwm, int dir, bool is_last){
+    return is_last ? (std::to_string(pwm) + "," std::to_string(dir) + "\r\n") : (std::to_string(pwm) + "," std::to_string(dir) + ",");
 }
 
 auto InverseKinematics::computePWM(double omega ){
@@ -86,3 +100,12 @@ auto InverseKinematics::computePWM(double omega ){
     int pwm = static_cast<int>((motor_rpm / max_rpm) * (max_pwm - min_pwm) + min_pwm + 0.5);
     return std::clamp(pwm, 0, 255);
 }
+
+
+// struct VelCmdValues
+// {
+//     uint8_t pwm_values[4] = {0,0,0,0};
+//     Direction dir_values[4] = {FORWARD,FORWARD,FORWARD,FORWARD};
+// };
+
+
