@@ -31,7 +31,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_library(inverse_kinematics src/inverse_kinematics.cpp)
+add_library(inverse_kinematics src/inverse_kinematics_test.cpp)
 target_include_directories(inverse_kinematics PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/inverse_kinematics>
   $<INSTALL_INTERFACE:include>

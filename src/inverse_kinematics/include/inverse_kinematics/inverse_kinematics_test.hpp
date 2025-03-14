@@ -1,5 +1,5 @@
-#ifndef INVERSE_KINEMATICS_HPP
-#define INVERSE_KINEMATICS_HPP
+#ifndef INVERSE_KINEMATICS_TEST_HPP
+#define INVERSE_KINEMATICS_TEST_HPP
 
 
 #include <memory>
@@ -10,7 +10,7 @@
 
 
 #include "rclcpp/rclcpp.hpp"
-#include "geometry_msgs/msg/twist.h"
+#include "geometry_msgs/msg/twist.hpp"
 #include "std_msgs/msg/string.hpp"
 
 class InverseKinematics : public rclcpp::Node {
@@ -19,7 +19,7 @@ class InverseKinematics : public rclcpp::Node {
         ~InverseKinematics();
 
         void updateDesiredSpeed(double v_x, double v_y, double omega);
-        void updateDesiredSpeed( const geometry_msgs__msg__Twist & twist );
+        void updateDesiredSpeed( const geometry_msgs::msg::Twist & twist );
 
         void convertToPWMSignal();
         uint8_t computePWM(double omega);

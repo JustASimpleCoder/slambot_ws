@@ -10,6 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(service_msgs REQUIRED) 
+find_package(geometry_msgs REQUIRED) 
 #find_package(type_description_interfaces REQUIRED)
 
 # Include directories
@@ -36,14 +37,21 @@ target_include_directories(cli_manual_control PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/robot_control>
   $<INSTALL_INTERFACE:include>
 )
-ament_target_dependencies(cli_manual_control rclcpp std_msgs )
+ament_target_dependencies(cli_manual_control rclcpp std_msgs geometry_msgs)
+
+add_library(autonomous_control src/autonomous_control.cpp)
+target_include_directories(autonomous_control PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/robot_control>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(autonomous_control rclcpp std_msgs geometry_msgs)
 
 add_library(serial_communication src/serial_communication.cpp)
 target_include_directories(serial_communication PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/robot_control>
   $<INSTALL_INTERFACE:include>
 )
-ament_target_dependencies(serial_communication rclcpp std_msgs )
+ament_target_dependencies(serial_communication rclcpp std_msgs geometry_msgs)
 
 # Build the executable
 add_executable(motor_control_node src/robot_control.cpp)
@@ -51,12 +59,15 @@ target_include_directories(motor_control_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-ament_target_dependencies(motor_control_node rclcpp std_msgs )
+
+ament_target_dependencies(motor_control_node rclcpp std_msgs geometry_msgs)
 target_link_libraries(motor_control_node cli_manual_control)
 target_link_libraries(motor_control_node serial_communication)
+target_link_libraries(motor_control_node autonomous_control)
 # Install targets
 install(TARGETS
   cli_manual_control
+  autonomous_control
   serial_communication
   motor_control_node
   DESTINATION lib/${PROJECT_NAME})

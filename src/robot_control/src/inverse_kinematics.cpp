@@ -3,14 +3,12 @@
 #include <chrono>
 
 InverseKinematics::InverseKinematics(int wheel_radus, int horizontal_dist_to_wheel, int vertical_dist_to_wheel )                
-                                : Node("arduino_test_node"),  
+                                :
                                 m_r(wheel_radus), m_a(horizontal_dist_to_wheel), m_b(vertical_dist_to_wheel), 
                                 m_pwm_lf(0), m_pwm_rf(0), m_pwm_lb(0), m_pwm_rb(0)
                                 
 {
 
-    m_publisher_ = this->create_publisher<std_msgs::msg::String>("arduino_test", 10);
-    m_timer_ = this->create_wall_timer(std::chrono::milliseconds(500) , [this](){this->publish_message();});
 
 };
 
@@ -24,7 +22,7 @@ void InverseKinematics::updateDesiredSpeed(double v_x, double v_y, double omega)
     m_omega_RB = (1 / (m_r)) * (v_x - v_y + (m_a + m_b) * omega);
 };
 
-void InverseKinematics::updateDesiredSpeed(const geometry_msgs__msg__Twist & twist ){
+void InverseKinematics::updateDesiredSpeed( const geometry_msgs::msg::Twist & twist ){
     updateDesiredSpeed(twist.linear.x, twist.linear.y, twist.angular.z);
 };
 
@@ -76,29 +74,3 @@ uint8_t InverseKinematics::computePWM(double omega ){
     std::clamp(pwm, 0, 255);
     return pwm;
 };
-
-void InverseKinematics::publish_message(){
-
-    geometry_msgs__msg__Twist twister;
-    twister.linear.x = 10;
-    twister.linear.y = 10;
-    twister.angular.z = 10;
-
-    updateDesiredSpeed(twister);
-    convertToPWMSignal();
-    std::string arduino_msg = getArduinoUnoMsg();
-    auto message = std_msgs::msg::String();
-    message.data = arduino_msg;
-    RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
-    this->m_publisher_->publish(message);
-
-}
-
-
-// struct VelCmdValues
-// {
-//     uint8_t pwm_values[4] = {0,0,0,0};
-//     Direction dir_values[4] = {FORWARD,FORWARD,FORWARD,FORWARD};
-// };
-
-

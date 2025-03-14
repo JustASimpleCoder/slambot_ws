@@ -1,5 +1,5 @@
 
-#include "inverse_kinematics.hpp"
+#include "inverse_kinematics_test.hpp"
 #include <iostream>
 
 int main(int argc,char ** argv){
