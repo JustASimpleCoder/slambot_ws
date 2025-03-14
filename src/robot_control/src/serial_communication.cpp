@@ -1,8 +1,8 @@
 
-#include "robot_control/serial_communication.hpp"
+#include "serial_communication.hpp"
 
 SerialCommunication::SerialCommunication(const std::string& port, int baud_rate) 
-    :   port_(port), baud_rate_(baud_rate), fd_(-1) {}
+    :   m_port_(port), m_baud_rate_(baud_rate), m_fd_(-1) {}
 
 SerialCommunication::~SerialCommunication() {
         if (is_open()) {
@@ -11,9 +11,9 @@ SerialCommunication::~SerialCommunication() {
     }
     
 bool SerialCommunication::open() {
-    fd_ = ::open(port_.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
-    if (fd_ == -1) {
-        std::cerr << "Failed to open serial port: " << port_ << std::endl;
+    m_fd_ = ::open(m_port_.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+    if (m_fd_ == -1) {
+        std::cerr << "Failed to open serial port: " << m_port_ << std::endl;
         return false;
     }
 
@@ -21,14 +21,14 @@ bool SerialCommunication::open() {
     struct termios tty;
     memset(&tty, 0, sizeof(tty));
 
-    if (tcgetattr(fd_, &tty) != 0) {
+    if (tcgetattr(m_fd_, &tty) != 0) {
         std::cerr << "Error getting terminal attributes" << std::endl;
         return false;
     }
 
     // Set baud rate
     speed_t speed;
-    switch (baud_rate_) {
+    switch (m_baud_rate_) {
         case 9600:   
             speed = B9600;   
             break;
@@ -74,25 +74,25 @@ bool SerialCommunication::open() {
     tty.c_cc[VMIN] = 0;  // Non-blocking read
     tty.c_cc[VTIME] = 10; // 1 second timeout
 
-    if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
+    if (tcsetattr(m_fd_, TCSANOW, &tty) != 0) {
         std::cerr << "Error setting terminal attributes" << std::endl;
         return false;
     }
 
-    std::cout << "Serial port opened successfully: " << port_ << std::endl;
+    std::cout << "Serial port opened successfully: " << m_port_ << std::endl;
     return true;
 }
 
 void SerialCommunication::close() {
     if (is_open()) {
-        ::close(fd_);
-        fd_ = -1;
-        std::cout << "Serial port closed: " << port_ << std::endl;
+        ::close(m_fd_);
+        m_fd_ = -1;
+        std::cout << "Serial port closed: " << m_port_ << std::endl;
     }
 }
 
 bool SerialCommunication::is_open() const {
-    return fd_ != -1;
+    return m_fd_ != -1;
 }
 
 ssize_t SerialCommunication::write(const std::string& data) {
@@ -100,7 +100,7 @@ ssize_t SerialCommunication::write(const std::string& data) {
         std::cerr << "Serial port is not open" << std::endl;
         return -1;
     }
-    return ::write(fd_, data.c_str(), data.size());
+    return ::write(m_fd_, data.c_str(), data.size());
 }
 
 std::string SerialCommunication::read() {
@@ -110,7 +110,7 @@ std::string SerialCommunication::read() {
     }
 
     char buffer[256];
-    ssize_t n = ::read(fd_, buffer, sizeof(buffer) - 1);
+    ssize_t n = ::read(m_fd_, buffer, sizeof(buffer) - 1);
     if (n > 0) {
         buffer[n] = '\0';
         return std::string(buffer);

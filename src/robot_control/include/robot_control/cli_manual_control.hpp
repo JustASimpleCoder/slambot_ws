@@ -1,6 +1,6 @@
 
-#ifndef CLI_MANUAl_HPP 
-#define CLI_MANUAl_HPP
+#ifndef CLI_MANUAL_HPP 
+#define CLI_MANUAL_HPP
 
 #include <chrono>
 #include <functional>
@@ -80,27 +80,27 @@ const std::unordered_map<std::string, std::string> command_descriptions = {
 
 // RobotMovement parse_command(const std::string &input);
 
-class MotorControllerPublisher : public rclcpp::Node
+class ManualControllerPublisher : public rclcpp::Node
 {
     public:
-        MotorControllerPublisher();
-        ~MotorControllerPublisher();
+        ManualControllerPublisher();
+        ~ManualControllerPublisher();
         
         void publish_user_command();
         void wait_for_user();
 
     private:
-        SerialCommunication serial_;
+        SerialCommunication m_serial_;
+        std::string m_user_input; 
 
-        std::string user_input; 
-        rclcpp::TimerBase::SharedPtr timer_;
-        rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
+        rclcpp::TimerBase::SharedPtr m_timer_;
+        rclcpp::Publisher<std_msgs::msg::String>::SharedPtr m_publisher_;
 
-        std::thread input_thread_;
-        std::atomic<bool> running_{true};
-        std::queue<std::string> command_queue_;
-        std::mutex queue_mutex_;
-        std::condition_variable queue_cv_;
+        std::thread m_input_thread_;
+        std::atomic<bool> m_running_{true};
+        std::queue<std::string> m_command_queue_;
+        std::mutex m_queue_mutex_;
+        std::condition_variable m_queue_cv_;
 };
 
 

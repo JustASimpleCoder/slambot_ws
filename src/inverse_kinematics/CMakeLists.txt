@@ -9,6 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -30,11 +31,28 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_executable(inv_kin src/inverse_kinematics.cpp)
-ament_target_dependencies(inv_kin rclcpp std_msgs geometry_msg)
+add_library(inverse_kinematics src/inverse_kinematics.cpp)
+target_include_directories(inverse_kinematics PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/inverse_kinematics>
+  $<INSTALL_INTERFACE:include>
+)
+ament_target_dependencies(inverse_kinematics rclcpp std_msgs geometry_msgs)
+
+
+add_executable(inv_kin src/main.cpp) 
+target_include_directories(inv_kin PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+
+ament_target_dependencies(inv_kin rclcpp std_msgs geometry_msgs)
+
+target_link_libraries(inv_kin inverse_kinematics)
+
 
 install(TARGETS
   inv_kin
+  inverse_kinematics
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY include/

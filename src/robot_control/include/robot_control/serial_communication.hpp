@@ -1,5 +1,5 @@
-#ifndef serial_communication_HPP
-#define serial_communication_HPP
+#ifndef SERIAL_COMMUNICATION_HPP
+#define SERIAL_COMMUNICATION_HPP
 
 #include <iostream>
 #include <fcntl.h>     
@@ -20,9 +20,9 @@ class SerialCommunication {
         std::string read();
     
     private:
-        std::string port_;
-        u_int32_t baud_rate_;
-        int fd_;
+        std::string m_port_;
+        u_int32_t m_baud_rate_;
+        int m_fd_;
 };
 
 #endif
