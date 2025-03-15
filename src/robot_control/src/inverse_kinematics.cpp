@@ -16,10 +16,10 @@ InverseKinematics::~InverseKinematics(){
 };
 
 void InverseKinematics::updateDesiredSpeed(double v_x, double v_y, double omega){
-    m_omega_LF = (1 / (m_r)) * (v_x - v_y - (m_a + m_b) * omega);
-    m_omega_RF = (1 / (m_r)) * (v_x + v_y + (m_a + m_b) * omega);
-    m_omega_LB = (1 / (m_r)) * (v_x + v_y - (m_a + m_b) * omega);
-    m_omega_RB = (1 / (m_r)) * (v_x - v_y + (m_a + m_b) * omega);
+    m_omega_lf = (1 / (m_r)) * (v_x - v_y - (m_a + m_b) * omega);
+    m_omega_rf = (1 / (m_r)) * (v_x + v_y + (m_a + m_b) * omega);
+    m_omega_lb = (1 / (m_r)) * (v_x + v_y - (m_a + m_b) * omega);
+    m_omega_rb = (1 / (m_r)) * (v_x - v_y + (m_a + m_b) * omega);
 };
 
 void InverseKinematics::updateDesiredSpeed( const geometry_msgs::msg::Twist & twist ){
@@ -35,15 +35,15 @@ void InverseKinematics::convertToPWMSignal(){
     // int RPM = 200; // min RPM at 6v
     // int n = 48; // gear ratio
 
-    m_pwm_lf = computePWM(m_omega_LF);
-    m_pwm_rf = computePWM(m_omega_RF);
-    m_pwm_lb = computePWM(m_omega_LB);
-    m_pwm_rb = computePWM(m_omega_RB);
+    m_pwm_lf = computePWM(m_omega_lf);
+    m_pwm_rf = computePWM(m_omega_rf);
+    m_pwm_lb = computePWM(m_omega_lb);
+    m_pwm_rb = computePWM(m_omega_rb);
 
-    m_dir_lf = (m_omega_LF >= 0) ? Directions::FORWARD : Directions::BACkWARD;
-    m_dir_rf = (m_omega_RF >= 0) ? Directions::FORWARD : Directions::BACkWARD;
-    m_dir_lb = (m_omega_LB >= 0) ? Directions::FORWARD : Directions::BACkWARD;
-    m_dir_rb = (m_omega_RB >= 0) ? Directions::FORWARD : Directions::BACkWARD;
+    m_dir_lf = (m_omega_lf >= 0) ? Directions::FORWARD : Directions::BACkWARD;
+    m_dir_rf = (m_omega_rf >= 0) ? Directions::FORWARD : Directions::BACkWARD;
+    m_dir_lb = (m_omega_lb >= 0) ? Directions::FORWARD : Directions::BACkWARD;
+    m_dir_rb = (m_omega_rb >= 0) ? Directions::FORWARD : Directions::BACkWARD;
 
     std::string arduino_msg = "";
     arduino_msg += msgConstructionHelper(m_pwm_lf, m_dir_lf, false);

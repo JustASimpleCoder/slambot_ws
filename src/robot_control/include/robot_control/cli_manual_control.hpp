@@ -1,6 +1,6 @@
 
-#ifndef CLI_MANUAL_HPP 
-#define CLI_MANUAL_HPP
+#ifndef CLI_MANUAL_CONTROL_HPP 
+#define CLI_MANUAL_CONTROL_HPP
 
 #include <chrono>
 #include <functional>
@@ -27,6 +27,7 @@
 
 using namespace std::chrono_literals;
 
+constexpr char KILL_COMMAND[] = "kill";
 
 enum class RobotMovement: char{
     STOP = 'x',
@@ -86,8 +87,9 @@ class ManualControllerPublisher : public rclcpp::Node
         ManualControllerPublisher();
         ~ManualControllerPublisher();
         
-        void publish_user_command();
-        void wait_for_user();
+        void publishUserCommand();
+        void waitForUser();
+        void displayControlGuide();
 
     private:
         SerialCommunication m_serial_;
@@ -97,7 +99,7 @@ class ManualControllerPublisher : public rclcpp::Node
         rclcpp::Publisher<std_msgs::msg::String>::SharedPtr m_publisher_;
 
         std::thread m_input_thread_;
-        std::atomic<bool> m_running_{true};
+        std::atomic<bool> m_running_;
         std::queue<std::string> m_command_queue_;
         std::mutex m_queue_mutex_;
         std::condition_variable m_queue_cv_;

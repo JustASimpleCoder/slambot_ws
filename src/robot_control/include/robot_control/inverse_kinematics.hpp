@@ -31,7 +31,7 @@ class InverseKinematics {
         // m_publisher_ = this->rclcpp::Publisher<std_msgs::msg::String>("arduino_testing", 10);
 
     private:
-        double m_omega_LF, m_omega_RF, m_omega_LB, m_omega_RB;
+        double m_omega_lf, m_omega_rf, m_omega_lb, m_omega_rb;
         double m_r, m_a, m_b;
         int m_pwm_lf, m_pwm_rf, m_pwm_lb, m_pwm_rb;
         int m_dir_lf, m_dir_rf, m_dir_lb, m_dir_rb;
