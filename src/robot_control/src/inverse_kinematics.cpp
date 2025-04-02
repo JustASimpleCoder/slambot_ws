@@ -27,7 +27,7 @@ void InverseKinematics::updateDesiredSpeed( const geometry_msgs::msg::Twist & tw
 };
 
 enum Directions{
-    BACkWARD,
+    BACKWARD,
     FORWARD
 };
 
@@ -40,10 +40,10 @@ void InverseKinematics::convertToPWMSignal(){
     m_pwm_lb = computePWM(m_omega_lb);
     m_pwm_rb = computePWM(m_omega_rb);
 
-    m_dir_lf = (m_omega_lf >= 0) ? Directions::FORWARD : Directions::BACkWARD;
-    m_dir_rf = (m_omega_rf >= 0) ? Directions::FORWARD : Directions::BACkWARD;
-    m_dir_lb = (m_omega_lb >= 0) ? Directions::FORWARD : Directions::BACkWARD;
-    m_dir_rb = (m_omega_rb >= 0) ? Directions::FORWARD : Directions::BACkWARD;
+    m_dir_lf = (m_omega_lf >= 0) ? Directions::FORWARD : Directions::BACKWARD;
+    m_dir_rf = (m_omega_rf >= 0) ? Directions::FORWARD : Directions::BACKWARD;
+    m_dir_lb = (m_omega_lb >= 0) ? Directions::FORWARD : Directions::BACKWARD;
+    m_dir_rb = (m_omega_rb >= 0) ? Directions::FORWARD : Directions::BACKWARD;
 
     std::string arduino_msg = "";
     arduino_msg += msgConstructionHelper(m_pwm_lf, m_dir_lf, false);
@@ -57,7 +57,7 @@ std::string InverseKinematics::getArduinoUnoMsg(){
     return m_arduino_uno_msg;
 };
 
-//comunication protocol "pwm, dir, pwm, dir, pwm, dir, pwm, dir\r\n"
+//comunication protocol "pwm,dir,pwm,dir,pwm,dir,pwm, dir\r\n"
 std::string InverseKinematics::msgConstructionHelper(int pwm, int dir, bool is_last){
     return is_last ? (std::to_string(pwm) + "," + std::to_string(dir) + "\r\n") : (std::to_string(pwm) + "," + std::to_string(dir) + ",");
 };
@@ -70,7 +70,7 @@ uint8_t InverseKinematics::computePWM(double omega ){
     motor_rpm = std::fabs(motor_rpm);
     motor_rpm = (motor_rpm > m_max_rpm) ? m_max_rpm : motor_rpm;
 
-    int pwm = static_cast<int>((motor_rpm / m_max_rpm) * (m_max_pwm - m_min_pwm) + m_min_pwm + 0.5);
+    int pwm = static_cast<uint8_t>((motor_rpm / m_max_rpm) * (m_max_pwm - m_min_pwm) + m_min_pwm + 0.5);
     std::clamp(pwm, 0, 255);
     return pwm;
 };

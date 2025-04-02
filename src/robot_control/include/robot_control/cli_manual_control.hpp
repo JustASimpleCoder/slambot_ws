@@ -15,6 +15,8 @@
 #include <queue>
 #include <mutex>
 
+#include <cstdio>
+
 // #include <iostream>
 // #include <fcntl.h>     
 // #include <unistd.h>     
@@ -28,6 +30,7 @@
 using namespace std::chrono_literals;
 
 constexpr char KILL_COMMAND[] = "kill";
+constexpr char KILL_COMMAND_CHAR = 'k';
 
 enum class RobotMovement: char{
     STOP = 'x',
@@ -45,6 +48,27 @@ enum class RobotMovement: char{
     SLOWER = '-',
     INVALID = '?'
 };
+
+// char was just for testing purposes
+// static const std::unordered_map<char, RobotMovement> command_map_char = {
+//     {'x', RobotMovement::STOP},
+//     {'w', RobotMovement::MOVE_FORWARD},
+//     {'s', RobotMovement::MOVE_BACKWARD},
+//     {'a', RobotMovement::ROTATE_LEFT},
+//     {'d', RobotMovement::ROTATE_RIGHT},
+//     {'l', RobotMovement::MOVE_LEFT},
+//     {'r', RobotMovement::MOVE_RIGHT},
+//     {'q', RobotMovement::DIAG_FORWARD_LEFT},
+//     {'e', RobotMovement::DIAG_FORWARD_RIGHT},
+//     {'z', RobotMovement::DIAG_BACKWARD_LEFT},
+//     {'c', RobotMovement::DIAG_BACKWARD_RIGHT},
+//     {'=', RobotMovement::FASTER},
+//     {'+', RobotMovement::FASTER},
+//     {'-', RobotMovement::SLOWER}
+// };
+
+
+
 static const std::unordered_map<std::string, RobotMovement> command_map = {
     {"x", RobotMovement::STOP},
     {"w", RobotMovement::MOVE_FORWARD},

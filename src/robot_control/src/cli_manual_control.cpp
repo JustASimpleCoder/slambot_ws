@@ -9,12 +9,13 @@ ManualControllerPublisher::ManualControllerPublisher()
 {
     // declare_parameter("usb_port", "/dev/ttyUSB0");
     // std::string usb_port = get_parameter("usb_port").as_string();
-    // m_serial_ = SerialPort(usb_port, 9600);  // Use ROS parameter
+    
 
-    // if (!m_serial_.open()) {
-    //     RCLCPP_ERROR(this->get_logger(), "Failed to open serial port!");
-    //     // throw std::runtime_error("Failed to open serial port");
-    // }
+    m_serial_.open();
+    if (!m_serial_.open()) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to open serial port!");
+        // throw std::runtime_error("Failed to open serial port");
+    }
     m_running_ = true;
     rclcpp::QoS qos_settings(1);  // Depth of 1 for minimal latency
     qos_settings.reliability(rclcpp::ReliabilityPolicy::BestEffort);
@@ -52,11 +53,11 @@ void ManualControllerPublisher::publishUserCommand()
             std::string command = m_command_queue_.front();
 
             m_command_queue_.pop();
-            // if (m_serial_.write(command + "\n") < 0) {
-            //     RCLCPP_ERROR(this->get_logger(), "Failed to send command over serial: %s", command.c_str());
-            // } else {
-            //     RCLCPP_INFO(this->get_logger(), "Sent command over serial: %s", command.c_str());
-            // }
+            if (m_serial_.write(command + "\n") < 0) {
+                RCLCPP_ERROR(this->get_logger(), "Failed to send command over serial: %s", command.c_str());
+            } else {
+                RCLCPP_INFO(this->get_logger(), "Sent command over serial: %s", command.c_str());
+            }
 
             auto message = std_msgs::msg::String();
             message.data = command;
@@ -70,39 +71,37 @@ void ManualControllerPublisher::publishUserCommand()
 
 void ManualControllerPublisher::waitForUser(){
     while (m_running_) {
-        std::string user_input;
-        std::cin >> user_input;
+        // std::string user_input
+        std::cin >> m_user_input;
 
-        if (user_input == KILL_COMMAND) {
+        if (m_user_input == KILL_COMMAND || m_user_input[0] == KILL_COMMAND_CHAR) {
             m_running_ = false;
             m_queue_cv_.notify_all();
             auto shutdown_message = std_msgs::msg::String();
             shutdown_message.data = "Shutting down the node...";
-            RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", shutdown_message.data.c_str());
+            RCLCPP_INFO(this->get_logger(), "'%s'", shutdown_message.data.c_str());
             rclcpp::shutdown();
-        
             break;
         }
         // Add valid input to the queue
-        auto it = command_map.find(user_input);
+        auto it = command_map.find(m_user_input);
         std::lock_guard<std::mutex> lock(m_queue_mutex_);
         if (it != command_map.end()) {
-            m_command_queue_.push(user_input);
+            m_command_queue_.push(m_user_input);
             m_queue_cv_.notify_all(); // Notify the publisher thread
         } else {
-            RCLCPP_WARN(this->get_logger(), "Invalid Input, you entered [%s]. Please refer to the control guide for valid inputs: ", user_input.c_str());
+            auto warn_message = std_msgs::msg::String();
+            warn_message.data = m_user_input;
+            RCLCPP_WARN(this->get_logger(), "Invalid Input, you entered [%s]. Please refer to the control guide for valid inputs: ", warn_message.data.c_str());
             displayControlGuide();
         }
     }
-
 }
 
 
-
-
 void ManualControllerPublisher::displayControlGuide(){
-    std::cout << "\n                     ";
-    std::cout << "🔹 **Control Guide** 🔹\n\n";
+    std::cout << "\n         ";
+    std::cout << "**Control Guide (Press enter after entering key)**\n\n";
 
     std::cout << "  ↖  q  - Move Diagonally Left-Up   | ";
     std::cout << "  ↗  e  - Move Diagonally Right-Up    \n\n";
@@ -119,7 +118,7 @@ void ManualControllerPublisher::displayControlGuide(){
     std::cout << "                     ";
     std::cout << "  ⏹  x  - Stop Moving\n";
     std::cout << "                     ";
-    std::cout << "  ❌  KILL - Shutdown Node and Exit Terminal\n";
+    std::cout << "  ❌  (k) or kill or - Shutdown Node and Exit Terminal\n";
 
     std::cout << R"(
              
